@@ -73,3 +73,5 @@ gem "omniauth-rails_csrf_protection"
 
 # Search
 gem "ransack"
+
+gem "dotenv-rails", groups: [:development, :test]

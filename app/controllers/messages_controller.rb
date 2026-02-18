@@ -7,15 +7,19 @@ class MessagesController < ApplicationController
     @users = User.where.not(id: current_user.id)
   end
 
-  def create
-    @message = Message.new(message_params)
-    @message.sender = current_user
-    if @message.save
-      redirect_to messages_path, notice: "Message sent!"
-    else
-      redirect_to messages_path, alert: "Could not send message."
-    end
+def create
+  @message = Message.new(message_params)
+  @message.sender = current_user
+  if @message.save
+    NotificationChannel.broadcast_to(
+      @message.receiver,
+      message: "New message from #{current_user.email}: #{@message.content.truncate(50)}"
+    )
+    redirect_to messages_path, notice: "Message sent!"
+  else
+    redirect_to messages_path, alert: @message.errors.full_messages.join(", ")
   end
+end
 
   private
 

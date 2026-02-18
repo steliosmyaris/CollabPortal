@@ -1,33 +1,72 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Collabportal" %></title>
+    <title>CollabPortal</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Collabportal">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application" %>
     <%= javascript_importmap_tags %>
   </head>
-
   <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <%= yield %>
+  <div id="notification-area"></div>
+    <nav style="background:#2c3e50; padding:10px 20px; color:white; display:flex; justify-content:space-between; align-items:center;">
+      <strong><%= link_to "CollabPortal", root_path, style: "color:white; text-decoration:none;" %></strong>
+      <div>
+        <% if user_signed_in? %>
+          <%= link_to "Posts", posts_path, style: "color:white; margin-right:15px;" %>
+          <%= link_to "Contacts", contacts_path, style: "color:white; margin-right:15px;" %>
+          <span style="color:white; margin-right:15px;"><%= current_user.email %></span>
+          <button onclick="document.getElementById('sign-out-form').submit();" style="background:none; border:none; color:white; cursor:pointer; margin-left:15px;">Sign Out</button>
+          <%= form_with url: destroy_user_session_path, method: :delete, id: "sign-out-form", style: "display:none;" do %>
+          <% end %>
+          <button onclick="toggleMessagePopup()" style="background:#27ae60; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:15px; border-radius:4px;">💬 Messages</button>
+        <% else %>
+          <%= link_to "Sign In", new_user_session_path, style: "color:white; margin-right:15px;" %>
+          <%= link_to "Sign Up", new_user_registration_path, style: "color:white;" %>
+        <% end %>
+      </div>
+    </nav>
+
+    <p class="notice" style="color:green; padding:5px 20px;"><%= notice %></p>
+    <p class="alert" style="color:red; padding:5px 20px;"><%= alert %></p>
+
+    <div style="padding:20px;">
+      <%= yield %>
+    </div>
+
+    <% if user_signed_in? %>
+      <div id="message-popup" style="display:none; position:fixed; bottom:0; right:20px; width:350px; background:white; border:1px solid #ccc; border-radius:8px 8px 0 0; box-shadow:0 -2px 10px rgba(0,0,0,0.2); z-index:1000;">
+        <div style="background:#2c3e50; color:white; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between;">
+          <strong>Messages</strong>
+          <button onclick="toggleMessagePopup()" style="background:none; border:none; color:white; cursor:pointer; font-size:16px;">✕</button>
+        </div>
+        <div style="height:250px; overflow-y:scroll; padding:10px;" id="messages-list">
+          <% messages = Message.where(sender: current_user).or(Message.where(receiver: current_user)).order(created_at: :asc).last(20) %>
+          <% messages.each do |msg| %>
+            <div style="margin:5px 0; padding:8px; background:<%= msg.sender == current_user ? '#dcf8c6' : '#f0f0f0' %>; border-radius:8px; max-width:85%;">
+              <small><strong><%= msg.sender == current_user ? "You" : msg.sender.email %></strong></small>
+              <p style="margin:2px 0;"><%= msg.content %></p>
+            </div>
+          <% end %>
+        </div>
+        <div style="padding:10px; border-top:1px solid #eee;">
+          <%= form_with url: messages_path, scope: :message, data: { turbo: false } do |f| %>
+            <%= f.select :receiver_id, User.where.not(id: current_user.id).map { |u| [u.email, u.id] }, { include_blank: "Select user..." }, { style: "width:100%; margin-bottom:5px;" } %>
+            <div style="display:flex; gap:5px;">
+              <%= f.text_field :content, placeholder: "Type a message...", style: "flex:1; padding:5px;", id: "popup-message-input" %>
+              <%= f.submit "Send", style: "background:#27ae60; color:white; border:none; padding:5px 10px; cursor:pointer;" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <script>
+      function toggleMessagePopup() {
+        var popup = document.getElementById('message-popup');
+        popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+      }
+    </script>
   </body>
-
-
 </html>
