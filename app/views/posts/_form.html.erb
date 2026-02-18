@@ -1,0 +1,23 @@
+<%= form_with model: post do |f| %>
+  <% if post.errors.any? %>
+    <div style="color:red">
+      <% post.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p>
+    <%= f.label :title %><br>
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <%= f.label :category %><br>
+    <%= f.select :category, ["Networks", "Databases", "Algorithms", "Software Engineering", "Other"] %>
+  </p>
+  <p>
+    <%= f.label :content %><br>
+    <%= f.text_area :content, rows: 5 %>
+  </p>
+  <%= f.submit %>
+<% end %>

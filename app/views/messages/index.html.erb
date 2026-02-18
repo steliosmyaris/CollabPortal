@@ -1,2 +1,29 @@
-<h1>Messages#index</h1>
-<p>Find me in app/views/messages/index.html.erb</p>
+<h1>Messages</h1>
+
+<div style="display: flex; gap: 20px;">
+  <div style="flex: 1; border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll;">
+    <% @messages.each do |msg| %>
+      <div style="margin: 10px 0; padding: 8px; background: <%= msg.sender == current_user ? '#dcf8c6' : '#f0f0f0' %>; border-radius: 8px;">
+        <small><strong><%= msg.sender == current_user ? "You" : msg.sender.email %></strong></small>
+        <p style="margin: 4px 0;"><%= msg.content %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div style="width: 300px;">
+    <h3>Send a Message</h3>
+    <%= form_with model: @message, url: messages_path do |f| %>
+      <p>
+        <%= f.label :receiver_id, "To:" %><br>
+        <%= f.select :receiver_id, @users.map { |u| [u.email, u.id] }, include_blank: "Select user..." %>
+      </p>
+      <p>
+        <%= f.label :content, "Message:" %><br>
+        <%= f.text_area :content, rows: 4, style: "width: 100%;" %>
+      </p>
+      <%= f.submit "Send" %>
+    <% end %>
+  </div>
+</div>
+
+<%= link_to "Back to Home", root_path %>

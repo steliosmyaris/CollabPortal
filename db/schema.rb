@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_18_142718) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_18_163143) do
   create_table "contacts", force: :cascade do |t|
     t.integer "contact_id", null: false
     t.datetime "created_at", null: false
@@ -54,7 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_142718) do
 
   add_foreign_key "contacts", "contacts"
   add_foreign_key "contacts", "users"
-  add_foreign_key "messages", "receivers"
-  add_foreign_key "messages", "senders"
+add_foreign_key "messages", "users", column: "sender_id"
+add_foreign_key "messages", "users", column: "receiver_id"
   add_foreign_key "posts", "users"
 end
