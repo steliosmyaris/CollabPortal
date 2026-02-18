@@ -20,7 +20,7 @@
           <button onclick="document.getElementById('sign-out-form').submit();" style="background:none; border:none; color:white; cursor:pointer; margin-left:15px;">Sign Out</button>
           <%= form_with url: destroy_user_session_path, method: :delete, id: "sign-out-form", style: "display:none;" do %>
           <% end %>
-          <button onclick="toggleMessagePopup()" style="background:#27ae60; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:15px; border-radius:4px;">💬 Messages</button>
+          <button onclick="toggleMessagePopup()" style="background:#27ae60; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:15px; border-radius:4px;">Messages</button>
         <% else %>
           <%= link_to "Sign In", new_user_session_path, style: "color:white; margin-right:15px;" %>
           <%= link_to "Sign Up", new_user_registration_path, style: "color:white;" %>
